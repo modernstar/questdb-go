@@ -308,6 +308,9 @@ func (m *Model) CreateTableIfNotExistStatement() string {
 			qdbType = String
 		}
 		out += fmt.Sprintf("\"%s\" %s", field.qdbName, qdbType)
+		if field.tagOptions.nocache {
+			out += " nocache"
+		}
 		if i != len(m.fields)-1 {
 			out += ", "
 		}

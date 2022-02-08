@@ -41,6 +41,7 @@ type tagOptions struct {
 	designatedTS    bool
 	commitZeroValue bool
 	index           bool
+	nocache         bool
 }
 
 // makeTagOptions func takes a tagOpts []string and returns a tagOptions struct
@@ -76,6 +77,13 @@ func makeTagOptions(f *field, tagsOpts []string) (tagOptions, error) {
 		}
 		opts.index = true
 	}
-
+	// nocache
+	nocacheField := getOption(tagsOpts, "nocache")
+	if nocacheField == "true" {
+		if f.qdbType != Symbol {
+			return opts, fmt.Errorf("type must be symbol if 'nocache' option set")
+		}
+		opts.nocache = true
+	}
 	return opts, nil
 }
