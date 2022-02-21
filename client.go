@@ -80,7 +80,7 @@ func (c *Client) Connect() error {
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", ErrILPNetDial, err)
 		}
-		conn.SetWriteBuffer(100 * 1024)
+		//conn.SetWriteBuffer(100 * 1024)
 		conn.SetWriteDeadline(time.Now().Add(time.Duration(c.config.ILPWriteTimeout) * time.Second))
 		if c.config.ILPAuthPrivateKey != "" {
 			if c.config.ILPAuthKid == "" {
