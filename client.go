@@ -182,6 +182,10 @@ func (c *Client) WriteMessage(message []byte) error {
 	defer conn.Close()
 	_, err = conn.Write(message)
 	if err != nil {
+		if pc, ok := conn.(*pool.PoolConn); ok {
+			pc.MarkUnusable()
+			pc.Close()
+		}
 		return err
 	}
 	return nil
@@ -202,6 +206,10 @@ func (c *Client) Write(a interface{}) error {
 	_, err = conn.Write(line)
 	//_, err = c.ilpConn.Write(line)
 	if err != nil {
+		if pc, ok := conn.(*pool.PoolConn); ok {
+			pc.MarkUnusable()
+			pc.Close()
+		}
 		return err
 	}
 	return nil
