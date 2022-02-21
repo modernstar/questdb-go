@@ -24,6 +24,7 @@ type Config struct {
 	ILPAuthPrivateKey string
 	ILPAuthKid        string
 	ILPPoolMaxSize    uint
+	ILPWriteTimeout   uint
 	PGConnStr         string
 }
 
@@ -47,6 +48,7 @@ func Default() *Client {
 			ILPAuthPrivateKey: "",
 			ILPAuthKid:        "",
 			ILPPoolMaxSize:    5,
+			ILPWriteTimeout:   5,
 			PGConnStr:         "postgresql://admin:quest@localhost:8812/qdb?sslmode=disable",
 		},
 	}
@@ -78,8 +80,8 @@ func (c *Client) Connect() error {
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", ErrILPNetDial, err)
 		}
-		conn.SetWriteBuffer(10 * 1024)
-		conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+		conn.SetWriteBuffer(100 * 1024)
+		conn.SetWriteDeadline(time.Now().Add(time.Duration(c.config.ILPWriteTimeout) * time.Second))
 		if c.config.ILPAuthPrivateKey != "" {
 			if c.config.ILPAuthKid == "" {
 				return nil, fmt.Errorf("cannot authenticate ilp without 'ILPAuthKid' set in config")
