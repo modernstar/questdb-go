@@ -48,7 +48,7 @@ func Default() *Client {
 			ILPAuthPrivateKey: "",
 			ILPAuthKid:        "",
 			ILPPoolMaxSize:    5,
-			ILPWriteTimeout:   5,
+			ILPWriteTimeout:   1,
 			PGConnStr:         "postgresql://admin:quest@localhost:8812/qdb?sslmode=disable",
 		},
 	}
@@ -80,8 +80,6 @@ func (c *Client) Connect() error {
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", ErrILPNetDial, err)
 		}
-		//conn.SetWriteBuffer(100 * 1024)
-		conn.SetWriteDeadline(time.Now().Add(time.Duration(c.config.ILPWriteTimeout) * time.Second))
 		if c.config.ILPAuthPrivateKey != "" {
 			if c.config.ILPAuthKid == "" {
 				return nil, fmt.Errorf("cannot authenticate ilp without 'ILPAuthKid' set in config")
@@ -180,6 +178,7 @@ func (c *Client) WriteMessage(message []byte) error {
 		return err
 	}
 	defer conn.Close()
+	conn.SetWriteDeadline(time.Now().Add(time.Duration(c.config.ILPWriteTimeout) * time.Second))
 	_, err = conn.Write(message)
 	if err != nil {
 		if pc, ok := conn.(*pool.PoolConn); ok {
@@ -188,6 +187,7 @@ func (c *Client) WriteMessage(message []byte) error {
 		}
 		return err
 	}
+
 	return nil
 }
 
@@ -203,6 +203,7 @@ func (c *Client) Write(a interface{}) error {
 		return err
 	}
 	defer conn.Close()
+	conn.SetWriteDeadline(time.Now().Add(time.Duration(c.config.ILPWriteTimeout) * time.Second))
 	_, err = conn.Write(line)
 	//_, err = c.ilpConn.Write(line)
 	if err != nil {
