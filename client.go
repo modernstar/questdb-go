@@ -70,12 +70,11 @@ var (
 // Connect func dials and connects both the Influx line protocol TCP connection as well
 // as the underlying sql PG database connection.
 func (c *Client) Connect() error {
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", c.config.ILPHost)
-	if err != nil {
-		return fmt.Errorf("%w: %v", ErrILPNetTCPAddrResolve, err)
-	}
-
 	factory := func() (net.Conn, error) {
+		tcpAddr, err := net.ResolveTCPAddr("tcp4", c.config.ILPHost)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %v", ErrILPNetTCPAddrResolve, err)
+		}
 		conn, err := net.DialTCP("tcp", nil, tcpAddr)
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", ErrILPNetDial, err)
